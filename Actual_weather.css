@@ -1,0 +1,159 @@
+body{
+    background-color: black;
+}
+
+
+#Aweather{
+    width: 700px;
+    height: 500px;
+    margin-left: 70px;
+    border: 2px solid #A3CEF1;
+    margin-top: 50px;
+    background-color: #274C77;
+    border-radius: 100px;
+   
+
+
+}
+
+#variable-box{
+    width: 300px;
+    height: 250px;
+    margin-left: 70px;
+    border: 2px solid #A3CEF1;
+    margin-top: 50px;
+    background-color: #E7ECEF;
+    border-radius: 100px;
+}
+
+#time-box {
+    width: 230px;
+    height: 70px;
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    margin-left: 420px;
+    border: 2px solid #A3CEF1;
+    position: relative;
+    bottom: 250px;
+    right: 10px;
+    background-color: #E7ECEF;
+    border-radius: 100px;
+
+}
+
+#temperature-box {
+    width: 230px;
+    height: 200px; /* Adjusted height to fit all elements */
+    margin-left: 410px;
+    border: 2px solid #A3CEF1;
+    margin-top: -230px;
+    background-color: #E7ECEF;
+    border-radius: 20px; /* Reduced border-radius for better alignment */
+    display: flex;
+    flex-direction: column; /* Column direction to stack elements vertically */
+    align-items: center; /* Center align elements horizontally */
+}
+
+#temperature {
+    width: 100%; /* Take full width of the container */
+    height: 50px;
+    border: solid blue;
+    text-align: center; /* Center text inside the div */
+    display: flex;
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+}
+
+.temp-detail-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly; /* Distribute space evenly between elements */
+    margin-top: 10px; /* Space between Temperature and detail divs */
+}
+
+.temp-detail {
+    width: auto; /* Adjust width as per content */
+    text-align: center; /* Center text inside the div */
+}
+
+.container-flex{
+    width: 650px;
+    height: 130px;
+    margin-left: 30px;
+    border: 2px solid #A3CEF1;
+    margin: top 100px;
+    margin-bottom: 50px;
+    background-color: #E7ECEF;
+    border-radius: 100px;
+    display: flex ;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+
+.container-flex > div {
+    margin-right: 20px;
+    margin-bottom: 50px;
+    margin-left: 30px; /* Increase the left margin to create more space */
+    padding: 50px 80px 30px 80px; /* Combined padding property */
+    border: solid black;
+    margin-top: 25px;
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    text-align: center; /* Center text inside the div */
+    box-sizing: border-box;
+    display: flex;
+    width: 80px;
+    
+
+}
+
+<?php
+    include 'dbConn.php';
+    include 'navibar.php';
+
+
+    $sql = "SELECT Actual_Weather, Date, Max_Temperature, Min_Temperature, Humidity, Barometer, Wind_Speed, Actual_Temperature FROM `weather status table` WHERE 1";
+    $result = $connection->query($sql); 
+      
+    $Max_Temperature = '';
+    $Min_Temperature = '';
+    $Humidity = '';
+    $Barometer = '';
+    $Wind_Speed = '';
+    $weather_status_String = '';
+    $data=array();
+    if($result->num_rows >0){
+        while ($row = $result->fetch_assoc()){
+            $weather_status_String = $row['Actual_Weather'];
+            $Max_Temperature = $row['Max_Temperature'];
+            $Min_Temperature = $row['Min_Temperature'];
+            $Humidity = $row['Humidity']; 
+            $Barometer = $row['Barometer']; 
+            $Wind_Speed = $row['Wind_Speed']; 
+            $Actual_Temperature = $row['Actual_Temperature']; 
+            $weather_status_array = explode('|', $row['Actual_Weather']);
+            // Identify the position of the 1.0 value
+            $weather_index = array_search('1.0', $weather_status_array);
+            // Define the weather status types
+            $weather_types = [
+                "Fog", "Haze", "Light rain passing clouds", "Light rain scattered clouds",
+                "Passing clouds", "Rain passing clouds", "Rain showers scattered clouds",
+                "Scattered clouds", "Thunderstorms passing clouds", "Thunderstorms scattered clouds"
+            ];
+            // Determine the actual weather
+            $row['Actual_Weather'] = isset($weather_types[$weather_index]) ? $weather_types[$weather_index] : 'Unknown';
+    
+            $data[] = $row;
+        }
+    }
+       
+$connection->close();
+    
+    
+echo json_encode($data);
+
+
+  
+
+?>
